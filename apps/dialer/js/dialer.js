@@ -10,6 +10,26 @@ document.addEventListener('mozvisibilitychange', function visibility(e) {
 
 var CallHandler = {
   call: function ch_call(number) {
+    var conn = window.navigator.mozMobileConnection;
+    if (!conn)
+      return;
+
+    var voice = conn.voice;
+    if (voice.emergencyCallsOnly) {
+      CustomDialog.show(
+        'balaba',
+        'flight mode bla bla',
+        {
+          title: 'Ok something',
+          callback: function() {
+            CustomDialog.hide();
+          }
+        }
+      );
+      return;
+    }
+
+    console.log('Chris *************************** I slip trhough :S');
     var settings = window.navigator.mozSettings, req;
 
     if (settings) {
