@@ -10,6 +10,7 @@ document.addEventListener('mozvisibilitychange', function visibility(e) {
 
 var CallHandler = {
   call: function ch_call(number) {
+    console.log('chris *********************: CallHandler.call() invoked');
     var settings = window.navigator.mozSettings, req;
 
     if (settings) {
@@ -123,9 +124,13 @@ window.addEventListener('localized', function startup(evt) {
 });
 
 window.navigator.mozSetMessageHandler('activity', function actHandle(activity) {
+  console.log('chris *********************: activity returned');
   var number = activity.source.data.number;
+  console.log('chris *********************: phone number:'+activity.source.data.number);
   var fillNumber = function actHandleDisplay() {
+    console.log('chris *********************: fillNuber() inv.');
     if (number) {
+      console.log('chris *********************: if number');
       KeypadManager.updatePhoneNumber(number);
       if (window.location.hash != '#keyboard-view') {
         window.location.hash = '#keyboard-view';
