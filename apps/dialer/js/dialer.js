@@ -10,23 +10,50 @@ document.addEventListener('mozvisibilitychange', function visibility(e) {
 
 var CallHandler = {
   call: function ch_call(number) {
-    var conn = window.navigator.mozMobileConnection;
-    if (!conn)
-      return;
+    var conn = window.navigator.mozMobileConnection, voice, telephony,
+        Call;
 
-    var voice = conn.voice;
-    if (voice.emergencyCallsOnly) {
-      CustomDialog.show(
-        'balaba',
-        'flight mode bla bla',
-        {
-          title: 'Ok something',
-          callback: function() {
-            CustomDialog.hide();
+    if (conn) {
+      console.log('Chris *************************** if conn');
+      voice = conn.voice;
+
+      //if (voice.emergencyCallsOnly) {
+        console.log('Chris *************************** if voice.emergencyCallsOnly');
+        var sanitizedNumber = number.replace(/-/g, '');
+        telephony = window.navigator.mozTelephony;
+
+        if (telephony) {
+          console.log('Chris *************************** if telephony');
+          console.log('Chris *************************** sanitizedNumber:' + sanitizedNumber);
+          Call = telephony.dialEmergency(sanitizedNumber);
+          console.log('Chris ***************************:'+Object.prototype.toString.call(Call));
+          console.log('Chris *************************** typeof:'+ typeof Call);
+          console.log('Chris *************************** [0]]:'+ Object.prototype.toString.call(Call[0]));
+          console.log('Chris *************************** [1]]:'+ Object.prototype.toString.call(Call[1]));
+          console.log('Chris *************************** [2]]:'+ Object.prototype.toString.call(Call[2]));
+          console.log('Chris *************************** [3]]:'+ Object.prototype.toString.call(Call[3]));
+          console.log('Chris *************************** [4]]:'+ Object.prototype.toString.call(Call[4]));
+          console.log('Chris *************************** [5]]:'+ Object.prototype.toString.call(Call[5]));
+
+          if (!Call) {
+            console.log('Chris *************************** if !Call');
+            CustomDialog.show(
+              _('emgcyDialogTitle'),
+              _('emgcyDialogBody'),
+              {
+                title: _('emgcyDialogBtnOk'),
+                callback: function() {
+                  CustomDialog.hide();
+                }
+              }
+            );
+          } else{
+              console.log('Chris *************************** if Call');
+              console.log('Chris *************************** Object.keys(Call).length:'+Object.keys(Call).length);
           }
         }
-      );
-      return;
+        return;
+      //}
     }
 
     console.log('Chris *************************** I slip trhough :S');
