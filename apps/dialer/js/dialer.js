@@ -10,50 +10,52 @@ document.addEventListener('mozvisibilitychange', function visibility(e) {
 
 var CallHandler = {
   call: function ch_call(number) {
-    var conn = window.navigator.mozMobileConnection, voice, telephony,
+    var conn = window.navigator.mozMobileConnection, telephony,
         Call;
 
     if (conn) {
       console.log('Chris *************************** if conn');
-      voice = conn.voice;
+      var voice = conn.voice;
+      console.log('Chris *************************** Object.prototype.toString(conn.voice): ' + Object.prototype.toString(conn.voice));
+      console.log('Chris *************************** Object.prototype.toString(conn.voice.emergencyCallsOnly): ' + Object.prototype.toString(conn.voice.emergencyCallsOnly));
 
-      //if (voice.emergencyCallsOnly) {
+      if (voice.emergencyCallsOnly) {
         console.log('Chris *************************** if voice.emergencyCallsOnly');
+        /*
         var sanitizedNumber = number.replace(/-/g, '');
         telephony = window.navigator.mozTelephony;
 
         if (telephony) {
           console.log('Chris *************************** if telephony');
-          console.log('Chris *************************** sanitizedNumber:' + sanitizedNumber);
           Call = telephony.dialEmergency(sanitizedNumber);
-          console.log('Chris ***************************:'+Object.prototype.toString.call(Call));
-          console.log('Chris *************************** typeof:'+ typeof Call);
-          console.log('Chris *************************** [0]]:'+ Object.prototype.toString.call(Call[0]));
-          console.log('Chris *************************** [1]]:'+ Object.prototype.toString.call(Call[1]));
-          console.log('Chris *************************** [2]]:'+ Object.prototype.toString.call(Call[2]));
-          console.log('Chris *************************** [3]]:'+ Object.prototype.toString.call(Call[3]));
-          console.log('Chris *************************** [4]]:'+ Object.prototype.toString.call(Call[4]));
-          console.log('Chris *************************** [5]]:'+ Object.prototype.toString.call(Call[5]));
 
-          if (!Call) {
+          Call.onstatechange = function(){
+            console.log('Chris *************************** Call.onstatechange:' + Call.state);
+          }
+
+          if (Call) {
             console.log('Chris *************************** if !Call');
-            CustomDialog.show(
-              _('emgcyDialogTitle'),
-              _('emgcyDialogBody'),
-              {
-                title: _('emgcyDialogBtnOk'),
-                callback: function() {
-                  CustomDialog.hide();
-                }
+            Call.onerror = function onerror(event) {
+              console.log('Chris *************************** event.call.error.name: ' + event.call.error.name);
+              var erName = event.call.error.name;
+              if (erName === 'BadNumberError' || erName === 'DeviceNotAcceptedError') {
+                CustomDialog.show(
+                  _('emgcyDialogTitle'),
+                  _('emgcyDialogBody'),
+                  {
+                    title: _('emgcyDialogBtnOk'),
+                    callback: function() {
+                      CustomDialog.hide();
+                    }
+                  }
+                );
               }
-            );
-          } else{
-              console.log('Chris *************************** if Call');
-              console.log('Chris *************************** Object.keys(Call).length:'+Object.keys(Call).length);
+            };
           }
         }
+        */
         return;
-      //}
+      } else console.log('Chris *************************** NOT emergencyCallsOnly');
     }
 
     console.log('Chris *************************** I slip trhough :S');
