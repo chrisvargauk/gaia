@@ -37,10 +37,10 @@ var CallHandler = {
             Call.onerror = function onerror(event) {
               console.log('Chris *************************** event.call.error.name: ' + event.call.error.name);
               var erName = event.call.error.name;
-              if (erName === 'BadNumberError' || erName === 'DeviceNotAcceptedError') {
+              //if (erName === 'BadNumberError' || erName === 'DeviceNotAcceptedError') {
                 CustomDialog.show(
                   _('emgcyDialogTitle'),
-                  _('emgcyDialogBody'),
+                  _('emgcyDialogBody')+' Error:'+erName,
                   {
                     title: _('emgcyDialogBtnOk'),
                     callback: function() {
@@ -48,7 +48,7 @@ var CallHandler = {
                     }
                   }
                 );
-              }
+              //}
             };
           }
         }
@@ -56,7 +56,8 @@ var CallHandler = {
       } else console.log('Chris *************************** NOT emergencyCallsOnly');
     }
 
-    console.log('Chris *************************** I slip trhough :S');
+    console.log('Chris *************************** It slip trhough :S');
+
     var settings = window.navigator.mozSettings, req;
 
     if (settings) {
