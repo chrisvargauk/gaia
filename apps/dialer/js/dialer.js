@@ -21,7 +21,6 @@ var CallHandler = {
 
       if (voice.emergencyCallsOnly) {
         console.log('Chris *************************** if voice.emergencyCallsOnly');
-        /*
         var sanitizedNumber = number.replace(/-/g, '');
         telephony = window.navigator.mozTelephony;
 
@@ -53,7 +52,6 @@ var CallHandler = {
             };
           }
         }
-        */
         return;
       } else console.log('Chris *************************** NOT emergencyCallsOnly');
     }
