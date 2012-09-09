@@ -109,6 +109,23 @@ var NavbarManager = {
   }
 };
 
+// Load Contacts if required
+(function() {
+  window.addEventListener('hashchange' , function wm_hashChange(event) {
+    var contactsIframe, srcMatch, src, timestamp, view;
+
+    contactsIframe = document.getElementById('iframe-contacts');
+    srcMatch = 'app://communications.gaiamobile.org/dialer/index.html';
+    view = window.location.hash.split('?')[0];
+
+    if (view === '#contacts-view' && contactsIframe.src === srcMatch) {
+      src = '/contacts/index.html';
+      timestamp = new Date().getTime();
+      contactsIframe.src = src + '?timestamp=' + timestamp;
+    }
+  });
+}());
+
 window.addEventListener('localized', function startup(evt) {
   window.removeEventListener('localized', startup);
   KeypadManager.init();
