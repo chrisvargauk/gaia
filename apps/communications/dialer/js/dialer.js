@@ -61,7 +61,13 @@ var CallHandler = {
       var sanitizedNumber = number.replace(/-/g, '');
       var telephony = window.navigator.mozTelephony;
       if (telephony) {
-        var call = telephony.dial(sanitizedNumber);
+        if (navigator.mozMobileConnection &&
+            navigator.mozMobileConnection.voice &&
+            navigator.mozMobileConnection.voice.emergencyCallsOnly) {
+          var call = telephony.dialEmergency(sanitizedNumber);
+        } else {
+          var call = telephony.dial(sanitizedNumber);
+        }
 
         if (call) {
           var cb = function clearPhoneView() {
@@ -69,6 +75,32 @@ var CallHandler = {
           };
           call.onconnected = cb;
           call.ondisconnected = cb;
+
+          call.onerror = function onerror(event) {
+            var erName = event.call.error.name, emgcyDialogBody,
+                errorRecognized = false;
+
+            if (erName === 'BadNumberError') {
+              errorRecognized = true;
+              emgcyDialogBody = 'emergencyDialogBodyBadNumber';
+            } else if (erName === 'DeviceNotAcceptedError') {
+              errorRecognized = true;
+              emgcyDialogBody = 'emergencyDialogBodyDeviceNotAccepted';
+            }
+
+            if(errorRecognized){
+              CustomDialog.show(
+                _('emergencyDialogTitle'),
+                _(emgcyDialogBody),
+                {
+                  title: _('emergencyDialogBtnOk'),
+                  callback: function() {
+                    CustomDialog.hide();
+                  }
+                }
+              );
+            }
+          };
         }
       }
     }
