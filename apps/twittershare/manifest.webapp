@@ -1,0 +1,25 @@
+{
+  "name": "Twitter share",
+  "description": "Uploading an image to twitter",
+  "launch_path": "/index.html",
+  "developer": {
+    "name": "lissyx",
+    "url": "https://github.com/lissyx/gaia/tree/image-uploader"
+  },
+  "permissions": [
+    "systemXHR",
+    "device-storage:pictures"
+  ],
+  "activities": {
+    "share-filenames": {
+      "filters": {
+        "type": "image"
+       },
+      "href": "/index.html",
+      "disposition": "window"
+    }
+  },
+  "icons": {
+    "128": "/style/icons/share.png"
+  }
+}
