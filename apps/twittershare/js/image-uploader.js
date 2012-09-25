@@ -33,9 +33,10 @@ var twitter = (function(){
     processTwitterXHR(
       'https://api.twitter.com/oauth/request_token',
       'POST',
-      {oauth_callback: 'http://hauste.krisztianvarga.co.uk/index_browser.php'},
-      //{oauth_callback: 'http://hauste.krisztianvarga.co.uk/index_phone.php'},
-      //{oauth_callback: 'http://hauste.krisztianvarga.co.uk/index.php'},
+      //{oauth_callback: 'http://hauste.krisztianvarga.co.uk/index_browser.php'},
+      {oauth_callback: 'http://hauste.krisztianvarga.co.uk/index_phone.php'},
+      //{oauth_callback: 'http://hauste.krisztianvarga.co.uk'},
+      //{oauth_callback: 'http://redirector.cloudfoundry.com?redirect_url=http://twittershare.gaiamobile.org:8080/index.html'},
       function(xhr) {
         if (xhr.status != 200) {
           alert('Request refused:', xhr.status);
@@ -204,17 +205,21 @@ var twitter = (function(){
     }
 
     var url = buildTwitterURL(
-      'https://api.twitter.com/1/statuses/update.json',
-      //'https://upload.twitter.com/1/statuses/update_with_media.json',
+      //'https://api.twitter.com/1/statuses/update.json',
+      'https://upload.twitter.com/1/statuses/update_with_media.json',
       'POST',
       {include_entities: true, status: twstatus}
     );
 
-    //var picture = new FormData();
-    //picture.append('media', 'http://hauste.krisztianvarga.co.uk/profile_pic.jpg');
+    console.log("ABOUT TO TWEET " + twstatus);
+
+    var picture = new FormData();
+    console.log('With image: ');
+    console.log(image);
+    picture.append('media', image);
 
     //XHRUpload(url, picture, function(xhr) {
-    XHRUpload(url, null, function(xhr) {
+    XHRUpload(url, picture, function(xhr) { 
       var json = JSON.parse(xhr.responseText);
       var id_str = json.entities.media[0].id_str;
       var ex_url = json.entities.media[0].expanded_url;
@@ -240,6 +245,7 @@ var twitter = (function(){
     xhr.onreadystatechange = function() {
       if (xhr.readyState == XMLHttpRequest.DONE) {
         console.log('Uploaded, treating response.');
+        console.log(xhr.responseText);
         callback(xhr);
       }
     };
@@ -264,7 +270,7 @@ var twitter = (function(){
 window.onload = function(){
   // # User needs to login first if not logged in yet
   if (typeof twitter.twitter_account == 'undefined'){
-    //twitter.login();
+    twitter.login();
   }
 
   // # Setup input
