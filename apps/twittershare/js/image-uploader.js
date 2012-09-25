@@ -264,7 +264,7 @@ var twitter = (function(){
 window.onload = function(){
   // # User needs to login first if not logged in yet
   if (typeof twitter.twitter_account == 'undefined'){
-    twitter.login();
+    //twitter.login();
   }
 
   // # Setup input

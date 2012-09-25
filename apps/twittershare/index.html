@@ -20,5 +20,14 @@
     <button id="btnSend">Send</button>
     <button id="btnRevoke">Revoke</button>
   </body>
+  <script language="javascript">
+    document.addEventListener("onImageReceived", function(e) { 
+      //e.data
+      var img = document.createElement('img');
+      img.style.width = '100px';
+      img.src = e.detail.data;
+      document.body.appendChild(img);
+    });
+  </script>
 </html>
 

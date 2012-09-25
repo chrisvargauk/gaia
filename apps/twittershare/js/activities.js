@@ -16,17 +16,21 @@ var ActivityHandler = (function Handler() {
     
     this._image = activity.source.data.urls[0];
     var event = new CustomEvent("onImageReceived", { 
-      data: this._image
+      detail: {
+        data: this._image
+      }
     });
 
     document.dispatchEvent(event);
   };
 
   var postCancel = function postCancel() {
+    this._currentActivity.postError('canceled');
     this._currentActivity = null;
   };
 
   var postSuccess = function postSuccess() {
+    this._currentActivity.postResult({result: 'ok'});
     this._currentActivity = null;
   };
 
