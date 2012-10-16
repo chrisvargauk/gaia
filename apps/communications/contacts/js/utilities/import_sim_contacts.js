@@ -27,7 +27,7 @@ function importSIMContacts(onread, onimport, onerror) {
     // early way out if no contacts have been found
     if (nContacts === 0) {
       if (onerror) {
-        onerror();
+        onerror('noContactOnSIM');
       }
       return;
     }
@@ -61,6 +61,25 @@ function importSIMContacts(onread, onimport, onerror) {
     }
   };
 
-  request.onerror = onerror;
+  request.onerror = function(){
+    var errorCode = 'unknownErrorMsg',
+        conn = window.navigator.mozMobileConnection;
+
+    if (conn &&
+        conn.voice.emergencyCallsOnly
+    ){
+      switch(conn.cardState) {
+        case 'absent':
+          errorCode = 'noSIM';
+        break;
+        case 'pinRequired':
+          errorCode = 'pinRequired';
+        break;
+      }
+
+    }
+
+    onerror(errorCode);
+  }
 }
 

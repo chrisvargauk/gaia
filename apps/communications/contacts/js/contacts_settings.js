@@ -256,8 +256,8 @@ contacts.Settings = (function() {
         addMessage(_('simContacts-imported', {n: num}), after);
         Contacts.hideOverlay();
       },
-      function onerror() {
-        addMessage(_('simContacts-error'), after);
+      function onerror(errorCode) {
+        addMessage(_(errorCode), after);
         Contacts.hideOverlay();
       });
   };
