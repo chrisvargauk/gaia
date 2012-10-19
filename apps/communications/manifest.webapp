@@ -32,7 +32,22 @@
     "mobileconnection":{},
     "attention":{},
     "settings":{},
-    "desktop-notification":{}
+    "desktop-notification":{},
+    "alarms": {},
+    "browser":{},
+    "power":{},
+    "webapps-manage":{},
+    "mozBluetooth":{},
+    "bluetooth":{},
+    "device-storage:pictures":{},
+    "storage":{},
+    "camera":{},
+    "geolocation":{},
+    "wifi-manage":{},
+    "wifi":{},
+    "idle":{},
+    "network-events":{},
+    "embed-apps":{}
   },
   "icons": {
     "120": "/dialer/style/icons/Dialer.png",

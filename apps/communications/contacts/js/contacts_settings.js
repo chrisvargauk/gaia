@@ -48,12 +48,23 @@ contacts.Settings = (function() {
 
   // Initialises variables and listener for the UI
   var initContainers = function initContainers() {
+    var conn = window.navigator.mozMobileConnection;
+
     orderCheckbox = document.querySelector('[name="order.lastname"]');
     orderCheckbox.addEventListener('change', onOrderingChange.bind(this));
 
     simImportLink = document.querySelector('[data-l10n-id="importSim"]');
-    simImportLink.addEventListener('click',
-      onSimImport);
+
+    // Check if SIM is in the phone
+    if (conn &&
+        conn.voice.emergencyCallsOnly &&
+        conn.cardState === 'absent'
+    ) {
+      simImportLink.style.color = '#CCC';
+    } else {
+      simImportLink.addEventListener('click',
+        onSimImport);
+    }
 
     fbImportLink = document.querySelector('[data-l10n-id="importFb"]');
     document.addEventListener('fb_imported', function onImported(evt) {

@@ -61,22 +61,28 @@ function importSIMContacts(onread, onimport, onerror) {
     }
   };
 
-  request.onerror = function(){
+  request.onerror = function() {
     var errorCode = 'unknownErrorMsg',
         conn = window.navigator.mozMobileConnection;
 
     if (conn &&
-        conn.voice.emergencyCallsOnly
-    ){
-      switch(conn.cardState) {
-        case 'absent':
-          errorCode = 'noSIM';
-        break;
-        case 'pinRequired':
-          errorCode = 'pinRequired';
-        break;
-      }
+        conn.voice.emergencyCallsOnly &&
+        conn.cardState === 'pinRequired'
+    ) {
+      errorCode = 'pinRequired';
 
+      var activity = new MozActivity({
+        name: 'configure',
+        data: {
+          target: 'simpin-unlock'
+        }
+      });
+      activity.onsuccess = function sl_unlockSuccess() {
+        // Go back to the current displayed app
+        // XXX: this should be removed when bug 798445 is fixed
+        // and bug 799039 actually works.
+        WindowManager.launch(WindowManager.getDisplayedApp());
+      };
     }
 
     onerror(errorCode);

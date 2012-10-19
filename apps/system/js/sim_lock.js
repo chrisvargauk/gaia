@@ -65,7 +65,9 @@ var SimLock = {
           // Go back to the current displayed app
           // XXX: this should be removed when bug 798445 is fixed
           // and bug 799039 actually works.
-          WindowManager.launch(WindowManager.getDisplayedApp());
+          //WindowManager.launch(WindowManager.getDisplayedApp());
+
+          console.log('***************************** Success');
         };
         break;
       case 'ready':
