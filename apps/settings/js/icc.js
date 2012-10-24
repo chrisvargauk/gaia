@@ -13,9 +13,13 @@
   /**
    * Debug method
    */
-  function debug(msg) {
+  function debug(msg, optObject) {
     if (DEBUG) {
-      console.log('[DEBUG] STKUI: ' + msg);
+      var output = '[DEBUG] STKUI: ' + msg;
+      if (optObject) {
+        output += JSON.stringify(optObject);
+      }
+      console.log(output);
     }
   }
 
@@ -76,12 +80,13 @@
    */
   function responseSTKCommand(response, force) {
     if (!force && (!iccLastCommand || !iccLastCommandProcessed)) {
-      return debug('sendStkResponse NO COMMAND TO RESPONSE. Ignoring');
+      debug('sendStkResponse NO COMMAND TO RESPONSE. Ignoring');
+      return;
     }
 
-    debug('sendStkResponse to command: ' +
-      JSON.stringify(iccLastCommand) +
-      ' # response = ' + JSON.stringify(response));
+    debug('sendStkResponse to command: ', iccLastCommand);
+    debug('sendStkResponse -- # response = ', response);
+
     icc.sendStkResponse(iccLastCommand, response);
     iccLastCommand = null;
     iccLastCommandProcessed = false;
@@ -91,7 +96,7 @@
    * Handle ICC Commands
    */
   function handleSTKCommand(command) {
-    debug('STK Proactive Command:' + JSON.stringify(command));
+    debug('STK Proactive Command:', command);
     iccLastCommand = command;
     var options = command.options;
 
@@ -118,7 +123,7 @@
         break;
 
       case icc.STK_CMD_DISPLAY_TEXT:
-        debug(' STK:Show message: ' + JSON.stringify(command));
+        debug(' STK:Show message: ', command);
         if (options.responseNeeded) {
           iccLastCommandProcessed = true;
           responseSTKCommand({
@@ -127,7 +132,7 @@
           displayText(command, null);
         } else {
           displayText(command, function(userCleared) {
-            debug('Display Text, cb: ' + JSON.stringify(command));
+            debug('Display Text, cb: ', command);
             iccLastCommandProcessed = true;
             if (command.options.userClear && !userCleared) {
               debug('No response from user (Timeout)');
@@ -144,10 +149,27 @@
         }
         break;
 
+      case icc.STK_CMD_SET_UP_IDLE_MODE_TEXT:
+        iccLastCommandProcessed = true;
+        responseSTKCommand({
+          resultCode: icc.STK_RESULT_OK
+        });
+        displayNotification(command);
+        break;
+
+      case icc.STK_CMD_REFRESH:
+        iccLastCommandProcessed = true;
+        responseSTKCommand({
+          resultCode: icc.STK_RESULT_OK
+        });
+        clearNotification();
+        break;
+
       case icc.STK_CMD_SEND_SMS:
       case icc.STK_CMD_SEND_SS:
       case icc.STK_CMD_SEND_USSD:
-        debug(' STK:Send message: ' + JSON.stringify(command));
+      case icc.STK_CMD_SEND_DTMF:
+        debug(' STK:Send message: ', command);
         iccLastCommandProcessed = true;
         responseSTKCommand({
           resultCode: icc.STK_RESULT_OK
@@ -181,13 +203,49 @@
         }
         break;
 
+      case icc.STK_CMD_SET_UP_EVENT_LIST:
+        debug(' STK:SetUp Event List. Events list: ' + options.eventList);
+        processSTKEvents(options.eventList);
+        iccLastCommandProcessed = true;
+        responseSTKCommand({ resultCode: icc.STK_RESULT_OK });
+        break;
+
       default:
-        debug('STK Message not managed ... response OK');
-        alert('[DEBUG] TODO: ' + JSON.stringify(command));
+        debug('STK Message not managed... response OK');
         iccLastCommandProcessed = true;
         responseSTKCommand({
           resultCode: icc.STK_RESULT_OK
         });
+    }
+  }
+
+  /**
+   * Process STK Events
+   */
+  function processSTKEvents(eventList) {
+    for (var evt in eventList) {
+      debug(' STK Registering event: ' + JSON.stringify(eventList[evt]));
+      switch (eventList[evt]) {
+      case icc.STK_EVENT_TYPE_MT_CALL:
+      case icc.STK_EVENT_TYPE_CALL_CONNECTED:
+      case icc.STK_EVENT_TYPE_CALL_DISCONNECTED:
+      case icc.STK_EVENT_TYPE_LOCATION_STATUS:
+      case icc.STK_EVENT_TYPE_USER_ACTIVITY:
+      case icc.STK_EVENT_TYPE_IDLE_SCREEN_AVAILABLE:
+      case icc.STK_EVENT_TYPE_CARD_READER_STATUS:
+      case icc.STK_EVENT_TYPE_LANGUAGE_SELECTION:
+      case icc.STK_EVENT_TYPE_BROWSER_TERMINATION:
+      case icc.STK_EVENT_TYPE_DATA_AVAILABLE:
+      case icc.STK_EVENT_TYPE_CHANNEL_STATUS:
+      case icc.STK_EVENT_TYPE_SINGLE_ACCESS_TECHNOLOGY_CHANGED:
+      case icc.STK_EVENT_TYPE_DISPLAY_PARAMETER_CHANGED:
+      case icc.STK_EVENT_TYPE_LOCAL_CONNECTION:
+      case icc.STK_EVENT_TYPE_NETWORK_SEARCH_MODE_CHANGED:
+      case icc.STK_EVENT_TYPE_BROWSING_STATUS:
+      case icc.STK_EVENT_TYPE_FRAMES_INFORMATION_CHANGED:
+        debug(' [DEBUG] STK TODO event: ' + JSON.stringify(eventList[evt]));
+        break;
+      }
     }
   }
 
@@ -216,13 +274,13 @@
         return;
       }
 
-      debug('STK Main App Menu title:', menu.title);
-      debug('STK Main App Menu default item:', menu.defaultItem);
+      debug('STK Main App Menu title: ' + menu.title);
+      debug('STK Main App Menu default item: ' + menu.defaultItem);
 
       iccMenuItem.textContent = menu.title;
       showTitle(menu.title);
       menu.items.forEach(function(menuItem) {
-        debug('STK Main App Menu item:' + menuItem.text + ' # ' +
+        debug('STK Main App Menu item: ' + menuItem.text + ' # ' +
               menuItem.identifier);
         iccStkList.appendChild(buildMenuEntry({
           id: 'stk-menuitem-' + menuItem.identifier,
@@ -236,7 +294,7 @@
 
   function onMainMenuItemClick(event) {
     var identifier = event.target.getAttribute('stk-menu-item-identifier');
-    debug('sendStkMenuSelection: ' + JSON.stringify(identifier));
+    debug('sendStkMenuSelection: ', identifier);
     icc.sendStkMenuSelection(identifier, false);
     stkLastSelectedTest = event.target.textContent;
     stkOpenAppName = stkLastSelectedTest;
@@ -378,6 +436,21 @@
   }
 
   /**
+   * Display text on the notifications bar and Idle screen
+   */
+  function displayNotification(command) {
+    var options = command.options;
+    NotificationHelper.send("STK", options.text);
+  }
+
+  /**
+   * Remove text on the notifications bar and Idle screen
+   */
+  function clearNotification() {
+    // TO-DO
+  }
+
+  /**
    * Auxiliar methods
    */
   function showTitle(title) {
@@ -428,3 +501,4 @@
   };
 
 })();
+

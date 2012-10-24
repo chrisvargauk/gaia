@@ -746,7 +746,12 @@ var MediaDB = (function() {
 
         var cursor = cursorRequest.result;
         if (cursor) {
-          callback(cursor.value);
+          try {
+            callback(cursor.value);
+          }
+          catch (e) {
+            console.warn('MediaDB.enumerate(): callback threw', e);
+          }
           cursor.continue();
         }
         else {
@@ -988,7 +993,8 @@ var MediaDB = (function() {
           // 4a: date and size are the same for both: do nothing
           // 4b: file has changed: it is both a deletion and a creation
           if (dsfile.name === dbfile.name) {
-            if (dsfile.lastModifiedDate.getTime() !== dbfile.date ||
+            var lastModified = dsfile.lastModifiedDate;
+            if ((lastModified && lastModified.getTime() !== dbfile.date) ||
                 dsfile.size !== dbfile.size) {
               deleteRecord(media, dbfile.name);
               insertRecord(media, dsfile);

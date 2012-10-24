@@ -186,12 +186,15 @@ input[type="image"] {
    * underlying problem.
    */
   transform: translateY(0px);
-  transition: transform 0.2s ease-in-out, height 0.2s ease-in-out;
+  transition: transform 0.2s ease-in-out;
 }
 
 #main-screen.address-hidden {
-  height: calc(100% + 50px);
   transform: translateY(-50px);
+}
+
+#main-screen.expanded {
+  height: calc(100% + 50px);
 }
 
 #tabs-badge {
@@ -242,11 +245,12 @@ input[type="image"] {
 
 #toolbar-end {
   display: none;
-  position: absolute;
+  position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
   background-image: -moz-linear-gradient(#323639, #272b2e);
+  z-index: 51;
 }
 
 .page-screen #toolbar-start {
@@ -571,6 +575,10 @@ a.recommend[role="button"]:active  {
   float: left;
 }
 
+#close-tab[disabled] {
+  display: none;
+}
+
 #try-reloading {
   float: right;
 }
@@ -845,32 +853,6 @@ li[role="listitem"] small {
   display: none;
 }
 
-#settings header {
-  background-color: #475659;
-  height: 50px;
-  background-image: linear-gradient(#323639, #272B2E);
-}
-
-#settings header h1 {
-  font-size: 20px;
-  color: white;
-  margin: 0;
-  line-height: 50px;
-  padding-left: 10px;
-  width: 100%;
-  font-weight: normal;
-}
-
-#settings header menu[type="toolbar"] {
-  height: 50px;
-  display: inline;
-}
-
-#settings h3 {
-  margin: 0 30px 15px 30px;
-  padding: 0;
-}
-
 #settings ul {
   margin: 0;
   padding: 0;
@@ -879,15 +861,6 @@ li[role="listitem"] small {
 #settings li {
   margin: 10px 30px;
   list-style-type: none;
-}
-
-#settings header button {
-  color: #fff;
-  height: 50px;
-}
-
-#settings header button:active {
-  background-color: rgba(0, 0, 0, 0.7);
 }
 
 #settings li button {
@@ -908,12 +881,6 @@ li[role="listitem"] small {
 #enable-cookies input {
   position: relative;
   top: -2px;
-}
-
-#settings-done-button {
-  width: 30px;
-  background: url(images/back-icon.png) no-repeat -3px center,
-    url('images/separator-large.png') no-repeat 20px center;
 }
 
 #settings [disabled="disabled"] {

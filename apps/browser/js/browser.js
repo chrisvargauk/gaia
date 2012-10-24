@@ -16,6 +16,10 @@ var Browser = {
   STOP: 2,
   SEARCH: 3,
 
+  VISIBLE: 0,
+  TRANSITIONING: 1,
+  HIDDEN: 2,
+
   PAGE_SCREEN: 'page-screen',
   TABS_SCREEN: 'tabs-screen',
   AWESOME_SCREEN: 'awesome-screen',
@@ -32,16 +36,19 @@ var Browser = {
   UPPER_SCROLL_THRESHOLD: 50, // hide address bar
   LOWER_SCROLL_THRESHOLD: 5, // show address bar
   MAX_TOP_SITES: 4, // max number of top sites to display
+  MAX_THUMBNAIL_WIDTH: 140,
+  MAX_THUMBNAIL_HEIGHT: 100,
   FIRST_TAB: 'tab_0',
 
   urlButtonMode: null,
+  addressBarState: null,
+
   inTransition: false,
 
   waitingActivities: [],
   hasLoaded: false,
 
   init: function browser_init() {
-
     this.getAllElements();
 
     // Add event listeners
@@ -138,6 +145,7 @@ var Browser = {
       this.showStartscreen();
       if (firstRun)
         this.populateDefaultData();
+      this.addressBarState = this.VISIBLE;
     }).bind(this));
   },
 
@@ -209,9 +217,9 @@ var Browser = {
   },
 
   handleCloseTab: function browser_handleCloseTab() {
+    if (Object.keys(this.tabs).length == 1)
+      return;
     this.hideCrashScreen();
-    if (this.currentTab.id = this.FIRST_TAB)
-      this.hideStartScreen();
     this.deleteTab(this.currentTab.id);
     this.setTabVisibility(this.currentTab, true);
     this.updateTabsCount();
@@ -294,7 +302,8 @@ var Browser = {
         // We capture screenshots for everything when loading is
         // completed, but set background tabs inactive
         if (tab.dom.getScreenshot) {
-          tab.dom.getScreenshot().onsuccess = (function(e) {
+          tab.dom.getScreenshot(this.MAX_THUMBNAIL_WIDTH,
+            this.MAX_THUMBNAIL_HEIGHT).onsuccess = (function(e) {
             tab.screenshot = e.target.result;
             if (!isCurrentTab) {
               this.setTabVisibility(tab, false);
@@ -412,14 +421,42 @@ var Browser = {
         break;
 
       case 'mozbrowserscroll':
-        if (evt.detail.top < this.LOWER_SCROLL_THRESHOLD) {
-          this.mainScreen.classList.remove('address-hidden');
-        } else if (evt.detail.top > this.UPPER_SCROLL_THRESHOLD) {
-          this.mainScreen.classList.add('address-hidden');
-        }
+        this.handleScroll(evt);
         break;
       }
     }).bind(this);
+  },
+
+  handleScroll: function browser_handleScroll(evt) {
+    if (evt.detail.top < this.LOWER_SCROLL_THRESHOLD) {
+      if (this.addressBarState == this.VISIBLE ||
+        this.addressBarState == this.TRANSITIONING) {
+        return;
+      }
+      var addressBarVisible = (function browser_addressBarVisible() {
+        this.mainScreen.classList.remove('expanded');
+        this.addressBarState = this.VISIBLE;
+        this.mainScreen.removeEventListener('transitionend',
+          addressBarVisible);
+      }).bind(this);
+      this.mainScreen.addEventListener('transitionend', addressBarVisible);
+      this.addressBarState = this.TRANSITIONING;
+      this.mainScreen.classList.remove('address-hidden');
+    } else if (evt.detail.top > this.UPPER_SCROLL_THRESHOLD) {
+      if (this.addressBarState == this.HIDDEN ||
+        this.addressBarState == this.TRANSITIONING) {
+        return;
+      }
+      var addressBarHidden = (function browser_addressBarHidden() {
+        this.addressBarState = this.HIDDEN;
+        this.mainScreen.removeEventListener('transitionend',
+          addressBarHidden);
+      }).bind(this);
+      this.mainScreen.classList.add('expanded');
+      this.addressBarState = this.TRANSITIONING;
+      this.mainScreen.addEventListener('transitionend', addressBarHidden);
+      this.mainScreen.classList.add('address-hidden');
+    }
   },
 
   handleUrlInputKeypress: function browser_handleUrlInputKeypress(evt) {
@@ -1007,7 +1044,7 @@ var Browser = {
             icon: item.icon,
             label: item.label,
             callback: function() {
-              evt.detail.contextMenuItemSelected(item.id)
+              evt.detail.contextMenuItemSelected(item.id);
             }
           });
         } else if (item.type === 'menu') {

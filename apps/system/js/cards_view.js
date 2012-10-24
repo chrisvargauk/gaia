@@ -47,6 +47,10 @@ var CardsView = (function() {
   var userSortedApps = [];
   var HVGA = document.documentElement.clientWidth < 480;
 
+  // init events
+  var gd = new GestureDetector(cardsView);
+  gd.startDetecting();
+
   /*
    * Returns an icon URI
    *
@@ -217,7 +221,8 @@ var CardsView = (function() {
       frameForScreenshot.getScreenshot(rect.width, rect.height).onsuccess =
         function gotScreenshot(screenshot) {
           if (screenshot.target.result) {
-            card.style.backgroundImage = 'url(' + screenshot.target.result + ')';
+            card.style.backgroundImage =
+                'url(' + screenshot.target.result + ')';
           }
 
           if (displayedApp == origin && displayedAppCallback)
@@ -226,7 +231,7 @@ var CardsView = (function() {
 
       // Set up event handling
       // A click elsewhere in the card switches to that task
-      card.addEventListener('click', runApp);
+      card.addEventListener('tap', runApp);
     }
   }
 
@@ -305,7 +310,7 @@ var CardsView = (function() {
     evt.stopPropagation();
     evt.target.setCapture(true);
     cardsView.addEventListener('mousemove', CardsView);
-    cardsView.addEventListener('mouseup', CardsView);
+    cardsView.addEventListener('swipe', CardsView);
 
     initialCardViewPosition = cardsView.scrollLeft;
     initialTouchPosition = {
@@ -383,23 +388,25 @@ var CardsView = (function() {
   function onEndEvent(evt) {
     evt.stopPropagation();
     var element = evt.target;
+    var eventDetail = evt.detail;
+    var direction = eventDetail.direction;
+
     document.releaseCapture();
     cardsView.removeEventListener('mousemove', CardsView);
-    cardsView.removeEventListener('mouseup', CardsView);
+    cardsView.removeEventListener('swipe', CardsView);
 
     var touchPosition = {
-        x: evt.touches ? evt.touches[0].pageX : evt.pageX,
-        y: evt.touches ? evt.touches[0].pageY : evt.pageY
+        x: eventDetail.end.pageX,
+        y: eventDetail.end.pageY
     };
 
     if (SNAPPING_SCROLLING && !draggingCardUp && reorderedCard === null) {
-      var differenceX = initialTouchPosition.x - touchPosition.x;
-      if (Math.abs(differenceX) > threshold) {
-        if (differenceX > 0 &&
+      if (Math.abs(eventDetail.dx) > threshold) {
+        if (direction === 'left' &&
             currentDisplayed <= cardsList.children.length) {
           currentDisplayed++;
           alignCard(currentDisplayed);
-        } else if (differenceX < 0 && currentDisplayed > 0) {
+        } else if (direction === 'right' && currentDisplayed > 0) {
           currentDisplayed--;
           alignCard(currentDisplayed);
         }
@@ -411,14 +418,13 @@ var CardsView = (function() {
     // if the element we start dragging on
     // is a card and we are not in reordering mode
     if (
-      evt.target.classList.contains('card') &&
+      element.classList.contains('card') &&
       MANUAL_CLOSING &&
       reorderedCard === null
     ) {
 
-      var differenceY = initialTouchPosition.y - touchPosition.y;
       draggingCardUp = false;
-      if (differenceY > removeCardThreshold) {
+      if (-eventDetail.dy > removeCardThreshold) {
 
         // remove the app also from the ordering list
         if (
@@ -434,7 +440,7 @@ var CardsView = (function() {
         // Without removing the listener before closing card
         // sometimes the 'click' event fires, even if 'mouseup'
         // uses stopPropagation()
-        element.removeEventListener('click', runApp);
+        element.removeEventListener('tap', runApp);
 
         // Remove the icon from the task list
         cardsList.removeChild(element);
@@ -448,7 +454,7 @@ var CardsView = (function() {
 
         return;
       } else {
-        evt.target.style.MozTransform = '';
+        element.style.MozTransform = '';
       }
     }
 
@@ -515,7 +521,7 @@ var CardsView = (function() {
         onMoveEvent(evt);
         break;
 
-      case 'mouseup':
+      case 'swipe':
         onEndEvent(evt);
         break;
 
@@ -559,3 +565,4 @@ var CardsView = (function() {
 window.addEventListener('holdhome', CardsView);
 window.addEventListener('home', CardsView);
 window.addEventListener('appwillopen', CardsView);
+

@@ -9,7 +9,7 @@
   },
   "entry_points": {
     "dialer": {
-      "launch_path": "/dialer/index.html",
+      "launch_path": "/dialer/index.html#keyboard-view",
       "name": "Phone",
       "icons": {
         "120": "/style/icons/Dialer.png",
@@ -34,20 +34,7 @@
     "settings":{},
     "desktop-notification":{},
     "alarms": {},
-    "browser":{},
-    "power":{},
-    "webapps-manage":{},
-    "mozBluetooth":{},
-    "bluetooth":{},
-    "device-storage:pictures":{},
-    "storage":{},
-    "camera":{},
-    "geolocation":{},
-    "wifi-manage":{},
-    "wifi":{},
-    "idle":{},
-    "network-events":{},
-    "embed-apps":{}
+    "systemXHR": {}
   },
   "icons": {
     "120": "/dialer/style/icons/Dialer.png",
@@ -81,6 +68,7 @@
   },
   "messages": [
      { "telephony-incoming": "/dialer/index.html" },
-     { "icc-dialing": "/dialer/index.html" }
+     { "icc-dialing": "/dialer/index.html" },
+     { "alarm": "/facebook/fb_sync.html" }
   ]
 }

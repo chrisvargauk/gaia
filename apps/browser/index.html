@@ -119,30 +119,16 @@
           </div>
         </div>
       </div>
-
-      <menu type="toolbar" id="toolbar-end">
-        <button type="button" value="" id="back-button" alt="Back"
-                title="" disabled="true"></button>
-        <button type="button" value="" id="forward-button" alt="Forward"
-                title="" disabled="true"></button>
-        <button type="button" value="" id="bookmark-button" alt="Bookmark"
-                title=""></button>
-      </menu>
-
-      <section id="bookmark-menu" role="dialog" class="hidden">
-        <menu class="actions">
-          <h3 data-l10n-id="bookmarks">Bookmarks</h3>
-          <ul>
-            <li><button id="bookmark-menu-add" data-l10n-id="bookmark">Bookmark</button></li>
-            <li><button id="bookmark-menu-remove" data-l10n-id="unbookmark">Unbookmark</button></li>
-            <li><button id="bookmark-menu-edit" data-l10n-id="edit-bookmark">Edit Bookmark</button></li>
-            <li><button id="bookmark-menu-add-home" data-l10n-id="add-to-home-screen">Add to Home Screen</button></li>
-            <li><button id="bookmark-menu-cancel" data-l10n-id="cancel">Cancel</button></li>
-          </ul>
-        </menu>
-      </section>
-
     </div>
+
+    <menu type="toolbar" id="toolbar-end">
+      <button type="button" value="" id="back-button" alt="Back"
+              title="" disabled="true"></button>
+      <button type="button" value="" id="forward-button" alt="Forward"
+              title="" disabled="true"></button>
+      <button type="button" value="" id="bookmark-button" alt="Bookmark"
+              title=""></button>
+    </menu>
 
     <div id="tray">
       <menu type="toolbar" id="tray-toolbar">
@@ -152,7 +138,20 @@
       <div id="tabs-list"></div>
     </div>
 
-    <section id="bookmark-entry-sheet" role="region" class="hidden skin-dark">
+    <section id="bookmark-menu" role="dialog" class="hidden">
+      <menu class="actions">
+        <h3 data-l10n-id="bookmarks">Bookmarks</h3>
+        <ul>
+          <li><button id="bookmark-menu-add" data-l10n-id="bookmark">Bookmark</button></li>
+          <li><button id="bookmark-menu-remove" data-l10n-id="unbookmark">Unbookmark</button></li>
+          <li><button id="bookmark-menu-edit" data-l10n-id="edit-bookmark">Edit Bookmark</button></li>
+          <li><button id="bookmark-menu-add-home" data-l10n-id="add-to-home-screen">Add to Home Screen</button></li>
+          <li><button id="bookmark-menu-cancel" data-l10n-id="cancel">Cancel</button></li>
+        </ul>
+      </menu>
+    </section>
+
+    <section id="bookmark-entry-sheet" role="region" class="hidden skin-organic">
       <header>
         <button id="bookmark-entry-sheet-cancel">
           <span class="icon icon-close" data-l10n-id="cancel">Cancel</span>
@@ -171,7 +170,7 @@
       <input type="hidden" id="bookmark-previous-url"></input>
     </section>
 
-    <section id="http-authentication-dialog" role="region" class="hidden skin-dark">
+    <section id="http-authentication-dialog" role="region" class="hidden skin-organic">
       <header>
         <button id="http-authentication-cancel">
           <span class="icon icon-close">close</span>
@@ -190,11 +189,9 @@
       </label>
     </section>
 
-    <div id="settings">
+    <section role="region" id="settings" class="skin-organic">
       <header id="settings-header">
-        <menu type="toolbar">
-          <button id="settings-done-button"></button>
-        </menu>
+        <button id="settings-done-button"><span class="icon icon-back"></span></button>
         <h1 data-l10n-id="firefox-settings">Firefox Settings</h1>
       </header>
       <ul>
@@ -203,7 +200,9 @@
                   data-l10n-id="about-firefox">About Firefox</button>
         </li>
       </ul>
-      <h3 data-l10n-id="privacy-and-security">Privacy & Security</h3>
+      <header>
+        <h2 data-l10n-id="privacy-and-security">Privacy & Security</h2>
+      </header>
       <ul>
         <li>
           <button id="clear-history-button"
@@ -215,7 +214,7 @@
         </li>
 
       </ul>
-    </div>
+    </section>
 
     <script src="js/places.js"></script>
     <script src="js/date_helper.js"></script>
