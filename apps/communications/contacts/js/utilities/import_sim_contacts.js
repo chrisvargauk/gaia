@@ -71,6 +71,24 @@ function importSIMContacts(onread, onimport, onerror) {
     ) {
       errorCode = 'pinRequired';
 
+      try{
+        var activity = new MozActivity({
+          name: 'configure',
+          data: {
+            target: 'simpin-unlock'
+          }
+        });
+        activity.onsuccess = function sl_unlockSuccess() {
+          // Go back to the current displayed app
+          // XXX: this should be removed when bug 798445 is fixed
+          // and bug 799039 actually works.
+          WindowManager.launch(WindowManager.getDisplayedApp());
+        };
+      } catch(e){
+        console.log('******************************************: ' + e);
+      }
+
+      /*
       var activity = new MozActivity({
         name: 'configure',
         data: {
@@ -83,6 +101,7 @@ function importSIMContacts(onread, onimport, onerror) {
         // and bug 799039 actually works.
         WindowManager.launch(WindowManager.getDisplayedApp());
       };
+      */
     }
 
     onerror(errorCode);

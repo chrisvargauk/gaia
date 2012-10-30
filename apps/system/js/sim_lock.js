@@ -5,6 +5,7 @@
 
 var SimLock = {
   init: function sl_init() {
+    /*
     // Listen to the first appwillopen event, where homescreen launches
     window.addEventListener('appwillopen', this);
 
@@ -15,6 +16,7 @@ var SimLock = {
     if (!conn)
       return;
     conn.addEventListener('cardstatechange', this);
+    */
   },
   handleEvent: function sl_handleEvent(evt) {
     switch (evt.type) {
